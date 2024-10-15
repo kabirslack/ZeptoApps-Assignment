@@ -1,0 +1,68 @@
+body {
+  padding: 5px;
+}
+.title {
+  text-align: center;
+}
+#book-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+Card {
+  padding: 2px;
+  border: 1px solid gainsboro;
+  width: 200px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+Card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+#wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 0px;
+  background: transparent;
+}
+.book-cover {
+  margin-bottom: 10px;
+}
+.book-details div {
+  padding: 5px;
+}
+.book-details div:nth-child(odd) {
+  background-color: lightgray;
+  color: black;
+}
+.book-details div:hover {
+  background-color: #3498db;
+  color: white;
+}
+.search-container {
+  display: flex;
+  justify-content: center;
+}
+.spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
