@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="./style.css" />
+    <link
+      rel="icon"
+      href="https://cf2.bstatic.com/static/img/favicon/40749a316c45e239a7149b6711ea4c48d10f8d89.ico"
+      sizes="32x32"
+    />
+
     <script type="module" src="./index.js"></script>
   </head>
   <body>
@@ -13,7 +19,13 @@
       <label>Filter</label>
       <input type="text" id="search-input" />
     </div>
-    <div id="wishlist"></div>
+    <div>
+      <h2 class="wish-header">Wishlist</h2>
+      <div id="wishlist"></div>
+    </div>
+    <div class="pagination-container">
+      <div id="paginate"></div>
+    </div>
     <div id="book-list"></div>
   </body>
 </html>

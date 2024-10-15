@@ -24,7 +24,7 @@ Card:hover {
   transform: translateY(-10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
-#wishlist-btn {
+.favorite-btn {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -48,9 +48,16 @@ Card:hover {
 .search-container {
   display: flex;
   justify-content: center;
+  gap: 10px
 }
-#wishlist{
-  padding: 20px
+ 
+.wishlist-container {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 30px;
+}
+.wish-header {
+  padding-left: 21px;
 }
 .spinner {
   border: 8px solid #f3f3f3;
