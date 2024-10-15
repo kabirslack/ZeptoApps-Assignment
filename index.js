@@ -26,6 +26,7 @@ export const main = async (url) => {
     paginate.previousPage = data.previous;
 
     loader(bookList, false);
+    books.length=0;
     books.push(...booksAll);
 
     input.addEventListener("keyup", (e) => {
