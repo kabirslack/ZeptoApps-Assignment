@@ -2,27 +2,31 @@ import getBooks from "../lib/getBooks.js";
 import bookTemplate from "../lib/bookTemplate.js";
 import loader from "../lib/loader.js";
 import { BooksLocal } from "./lib/books.js";
-const books = [];
+import DisplayWishlist from "./lib/displayWishlist.js";
+export const books = [];
 const main = async () => {
-  const input = document.getElementById("search-input");
-  const bookList = document.getElementById("book-list");
+  try {
+    const input = document.getElementById("search-input");
+    const bookList = document.getElementById("book-list");
 
+    loader(bookList, true);
+    const booksAll = BooksLocal.results;
+    loader(bookList, false);
+    books.push(...booksAll);
 
-  loader(bookList, true);
-  //   const booksAll = await getBooks();
-  const booksAll = BooksLocal.results;
-  loader(bookList, false);
-  books.push(...booksAll);
-
-  input.addEventListener("keyup", (e) => {
-    let filteredBooks = books.filter((book) => {
-      return book.title.toLowerCase().includes(e.target.value.toLowerCase());
+    input.addEventListener("keyup", (e) => {
+      let filteredBooks = books.filter((book) => {
+        return book.title.toLowerCase().includes(e.target.value.toLowerCase());
+      });
+      console.log(filteredBooks);
+      render(bookList, filteredBooks);
     });
-    console.log(filteredBooks);
-    render(bookList, filteredBooks);
-  });
 
-  render(bookList, books);
+    render(bookList, books);
+  } catch (error) {
+  } finally {
+    DisplayWishlist();
+  }
 };
 
 main();
