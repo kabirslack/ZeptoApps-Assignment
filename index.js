@@ -1,5 +1,5 @@
-// import bookTemplate from "../lib/bookTemplate.js";
 import loader from "../lib/loader.js";
+import BookDesign from "./lib/bookTemplate.js";
 // import { BooksLocal } from "./lib/books.js";
 // import DisplayWishlist from "./lib/displayWishlist.js";
 // import getBooks from "./lib/getBooks.js";
@@ -84,15 +84,16 @@ window.addEventListener("hashchange", () => {
 });
 
 function route(hash) {
-  switch (hash) {
-    case "":
+  switch (true) {
+    case hash === "" || hash === "#":
       page = homepage();
       break;
-    case "#":
-      page = homepage();
-      break;
-    case "#wishlist":
+    case hash === "#wishlist":
       page = wishlist();
+      break;
+    case hash.startsWith("#book/"):
+      const bookId = hash.split("/")[1];
+      page = book(bookId);
       break;
     default:
       page = notFound();
@@ -101,6 +102,33 @@ function route(hash) {
 }
 
 /** Pages */
+
+function book(bookId) {
+  let content = document.getElementById("content");
+  let books = result?.results?.filter((item) => item.id == bookId);
+  let loop = [];
+  books?.forEach((book) => {
+    loop.push(BookDesign(book));
+  });
+
+  content.innerHTML = `<div>
+  <header>
+        <nav>
+          <a href="#">Home</a>
+          <a href="#wishlist">Wishlist</a>
+        </nav>
+        <div class="wishcounter">
+          <span class="mdi--heart"></span>
+          <span class="count">0</span>
+        </div>
+      </header>
+      <div>Welcome to Book Details Page</div>
+    <h1>Book Details</h1>
+    ${loop.join("")}
+  </div>`;
+
+  toggleCount();
+}
 
 async function homepage() {
   let content = document.getElementById("content");
@@ -156,8 +184,12 @@ async function homepage() {
 
     RenderBooks(filteredBooks);
   });
+  console.log(result?.results?.length);
   loader(document.getElementById("book-list"), true);
-  result = await Getdata("https://gutendex.com/books");
+  if (result?.results?.length > 0) {
+  } else {
+    result = await Getdata("https://gutendex.com/books");
+  }
   loader(document.getElementById("book-list"), false);
 
   booksdata = result.results;
@@ -217,20 +249,36 @@ function toggleCount() {
 }
 
 function RenderBooks(booksdata, remove = false) {
-  const books = booksdata
-    .map(
-      (item) =>
-        `<div>${item.title} 
-      <button type="button" bookid= ${item.id} id="wishlist-btn${
-          remove ? "-remove" : ""
-        }">${remove? "Remove": "Add to Wishlist"}</button>
-        </div>`
-    )
-    .join("");
-  document.getElementById("book-list").innerHTML = books;
+  const books = booksdata?.map((item) => BookDesign(item)).join("");
+  let area = document.getElementById("book-list");
+  if (area) {
+    area.innerHTML = books;
+  }
+
+  let wishBtn = document.querySelectorAll("#wishlist-btn");
+  wishBtn.forEach((item) => {
+    item.addEventListener("click", (event) => {
+     console.log(event.currentTarget)
+     if (event.currentTarget.id == "wishlist-btn") {
+      console.log("wish button clicked");
+      let btnBookId = event.currentTarget.getAttribute("bookid");
+      let books = result.results;
+      let book = books.filter((item) => Number(item.id) == Number(btnBookId));
+      toggleWishlist(book);
+    } else if (event.currentTarget.id == "wishlist-btn-remove") {
+      let btnBookId = event.currentTarget.getAttribute("bookid");
+      let books = JSON.parse(localStorage.getItem("wishlist")).filter(
+        (item) => item.id != btnBookId
+      );
+      localStorage.setItem("wishlist", JSON.stringify(books));
+      toggleCount();
+      RenderBooks(books, true);
+    }
+    });
+  });
 }
 
-function toggleWishlist(book) {
+export function toggleWishlist(book) {
   let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
   let isExist = wishlist.find((item) => {
     console.log({ item });
@@ -250,19 +298,4 @@ function toggleWishlist(book) {
 }
 
 /** Events */
-window.addEventListener("click", (event) => {
-  if (event.target.id == "wishlist-btn") {
-    let btnBookId = event.target.getAttribute("bookid");
-    let books = result.results;
-    let book = books.filter((item) => Number(item.id) == Number(btnBookId));
-    toggleWishlist(book);
-  } else if (event.target.id == "wishlist-btn-remove") {
-    let btnBookId = event.target.getAttribute("bookid");
-    let books = JSON.parse(localStorage.getItem("wishlist")).filter(
-      (item) => item.id != btnBookId
-    );
-    localStorage.setItem("wishlist", JSON.stringify(books));
-    toggleCount();
-    RenderBooks(books, true);
-  }
-});
+window.addEventListener("click", (event) => {});
