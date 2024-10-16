@@ -76,3 +76,44 @@ Card:hover {
     transform: rotate(360deg);
   }
 }
+
+.mdi--heart {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+span.mdi--heart {
+  font-size: x-large;
+  color: red;
+}
+span.count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ffcdcd80;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  color: #000000;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.wishcounter {
+  position: relative;
+  width: 32px;
+}
+header {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+}
