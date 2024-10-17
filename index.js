@@ -1,5 +1,7 @@
 import loader from "../lib/loader.js";
+import { BooksLocal } from "./lib/books.js";
 import BookDesign from "./lib/bookTemplate.js";
+import { RenderPaginate } from "./lib/RenderPaginate.js";
 // import { BooksLocal } from "./lib/books.js";
 // import DisplayWishlist from "./lib/displayWishlist.js";
 // import getBooks from "./lib/getBooks.js";
@@ -58,27 +60,27 @@ import BookDesign from "./lib/bookTemplate.js";
 //   });
 // }
 
-// export function handleNext() {
-//   console.log("handle next called");
-//   main(paginate.nextPage);
-// }
+export function handleNext() {
+  console.log("handle next called");
+  main(paginate.nextPage);
+}
 
-// export function handlePrevious() {
-//   console.log("handle previous called");
-//   main(paginate.previousPage);
-// }
+export function handlePrevious() {
+  console.log("handle previous called");
+  main(paginate.previousPage);
+}
 let page;
 let result;
+let url = "https://gutendex.com/books";
+
 const main = async () => {
   const hash = window.location.hash;
-  console.log(hash);
   route(hash);
   Render(page);
 };
 window.addEventListener("load", main);
 window.addEventListener("hashchange", () => {
   const hash = window.location.hash;
-  console.log(hash);
   route(hash);
   Render(page);
 });
@@ -156,7 +158,8 @@ async function homepage() {
         </select>
       </div>
       <input id="filter" placeholder="Book Title" />
-      
+        <div>Paginate<div>
+        <div id="paginate"></div>
       <div id="book-list"></div>
   </div>`;
   content.innerHTML = html;
@@ -184,11 +187,11 @@ async function homepage() {
 
     RenderBooks(filteredBooks);
   });
-  console.log(result?.results?.length);
+
   loader(document.getElementById("book-list"), true);
   if (result?.results?.length > 0) {
   } else {
-    result = await Getdata("https://gutendex.com/books");
+    result = await Getdata(url || "https://gutendex.com/books");
   }
   loader(document.getElementById("book-list"), false);
 
@@ -199,15 +202,21 @@ async function homepage() {
     RenderBooks(booksdata);
   }
   toggleCount();
+
+  RenderPaginate(result);
 }
 
-function wishlist() {
+async function wishlist() {
+  if (!result) {
+    result = await Getdata("https://gutendex.com/books");
+  }
   let content = document.getElementById("content");
   content.innerHTML = `<div>
    <header>
     <nav>
       <a href="#">Home</a>
       <a href="#wishlist">Wishlist</a>
+      <a href="#about">About</a>
     </nav>
     <div class="wishcounter">
       <span class="mdi--heart"></span>
@@ -215,6 +224,7 @@ function wishlist() {
     </div>
   </header>
   <div>Welcome to Wishlist Page</div>
+
   <div id="book-list"></div>
   </div>`;
   toggleCount();
@@ -240,12 +250,13 @@ async function Getdata(url) {
   const response = await fetch(url);
   const data = await response.json();
   return data;
+  // return BooksLocal;
 }
 
 function toggleCount() {
   document.querySelector(".count").textContent = JSON.parse(
     localStorage.getItem("wishlist")
-  ).length;
+  )?.length;
 }
 
 function RenderBooks(booksdata, remove = false) {
@@ -258,31 +269,30 @@ function RenderBooks(booksdata, remove = false) {
   let wishBtn = document.querySelectorAll("#wishlist-btn");
   wishBtn.forEach((item) => {
     item.addEventListener("click", (event) => {
-     console.log(event.currentTarget)
-     if (event.currentTarget.id == "wishlist-btn") {
-      console.log("wish button clicked");
-      let btnBookId = event.currentTarget.getAttribute("bookid");
-      let books = result.results;
-      let book = books.filter((item) => Number(item.id) == Number(btnBookId));
-      toggleWishlist(book);
-    } else if (event.currentTarget.id == "wishlist-btn-remove") {
-      let btnBookId = event.currentTarget.getAttribute("bookid");
-      let books = JSON.parse(localStorage.getItem("wishlist")).filter(
-        (item) => item.id != btnBookId
-      );
-      localStorage.setItem("wishlist", JSON.stringify(books));
-      toggleCount();
-      RenderBooks(books, true);
-    }
+      // console.log(event.currentTarget);
+      if (event.currentTarget.id == "wishlist-btn") {
+        let mydiv = event.currentTarget;
+        let btnBookId = event.currentTarget.getAttribute("bookid");
+        let books = result.results;
+        let book = books.filter((item) => Number(item.id) == Number(btnBookId));
+        toggleWishlist(book, mydiv);
+      } else if (event.currentTarget.id == "wishlist-btn-remove") {
+        let btnBookId = event.currentTarget.getAttribute("bookid");
+        let books = JSON.parse(localStorage.getItem("wishlist")).filter(
+          (item) => item.id != btnBookId
+        );
+        localStorage.setItem("wishlist", JSON.stringify(books));
+        mydiv.classList.remove("green");
+        toggleCount();
+        RenderBooks(books, true);
+      }
     });
   });
 }
 
-export function toggleWishlist(book) {
+export function toggleWishlist(book, mydiv) {
   let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
   let isExist = wishlist.find((item) => {
-    console.log({ item });
-    console.log({ book: book[0].id });
     return item.id == book[0].id;
   });
 
@@ -290,12 +300,17 @@ export function toggleWishlist(book) {
     wishlist = wishlist.filter((item) => item.id != book[0].id);
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
     toggleCount();
+    let hash = window.location.hash;
+    if (hash == "#wishlist") {
+      document.querySelector(`#book${book[0].id}`).remove();
+    }
+    mydiv.classList.remove("green");
     return;
   } else {
+    mydiv.classList.add("green");
     localStorage.setItem("wishlist", JSON.stringify([...wishlist, ...book]));
     toggleCount();
   }
 }
 
 /** Events */
-window.addEventListener("click", (event) => {});

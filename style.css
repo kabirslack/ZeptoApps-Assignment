@@ -48,9 +48,9 @@ Card:hover {
 .search-container {
   display: flex;
   justify-content: center;
-  gap: 10px
+  gap: 10px;
 }
- 
+
 .wishlist-container {
   display: flex;
   flex-wrap: wrap;
@@ -92,7 +92,6 @@ Card:hover {
 }
 span.mdi--heart {
   font-size: x-large;
-  color: red;
 }
 span.count {
   position: absolute;
@@ -116,4 +115,8 @@ header {
   display: flex;
   justify-content: center;
   gap: 25px;
+}
+
+.green {
+  color: greenyellow !important;
 }
