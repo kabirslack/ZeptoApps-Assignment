@@ -1,4 +1,5 @@
 import loader from "../lib/loader.js";
+import { BooksLocal } from "./lib/books.js";
 
 import BookDesign from "./lib/bookTemplate.js";
 import { RegisterPaginateEvent, RenderPaginate } from "./lib/RenderPaginate.js";
@@ -9,6 +10,9 @@ let booksdata = result?.results;
 let filteredBooks;
 let isloading = false;
 let url = "https://gutendex.com/books";
+
+let filter = localStorage.getItem("filter");
+let topic = localStorage.getItem("topic");
 
 export async function handleNext() {
   console.log("handle next called");
@@ -71,14 +75,17 @@ async function book(bookId) {
   let book;
   book = result?.results?.find((item) => item.id == bookId);
   if (!book) {
-    book = JSON.parse(localStorage.getItem("wishlist")).find(
-      (item) => item.id == Number(bookId)
-    );
+    book =
+      JSON.parse(localStorage.getItem("wishlist")) &&
+      JSON.parse(localStorage.getItem("wishlist")).find(
+        (item) => item.id == Number(bookId)
+      );
     if (!book) {
       let hash = document.location.hash;
       let first = hash.split("/")[1];
       // location.href = `/#book/${first}`;
       // console.log(first)
+      loader(document.getElementById("content"), true);
       let response = await Getdata(`https://gutendex.com/books/${first}`);
       book = response;
     }
@@ -96,6 +103,7 @@ async function book(bookId) {
   // });
   // console.log({ book });
   content.innerHTML = `<div class="book-details-single">
+  
   <header>
         <nav>
           <a href="#">Home</a>
@@ -109,7 +117,13 @@ async function book(bookId) {
       <div>Welcome to Book Details Page</div>
     <h1>Book Details</h1>
     ${book ? BookDesign(book) : ""}
-  </div>`;
+  </div>
+   <style>
+  #wishlist-btn{
+  display: none;
+  }
+  </style>
+  `;
 
   toggleCount();
 }
@@ -145,30 +159,22 @@ async function homepage() {
       <div id="book-list"></div>
   </div>`;
   content.innerHTML = html;
-  // filter
 
   document.getElementById("filter").addEventListener("keyup", (event) => {
     let title = event.target.value;
     localStorage.setItem("filter", title);
-    if (filteredBooks) {
-      let book = filteredBooks.filter((item) =>
-        item.title.toLowerCase().includes(title.toLowerCase())
-      );
-      RenderBooks(book);
-    }
+    filter = title;
+    doFilter();
+    // RenderBooks(filteredBooks);
   });
   document.getElementById("topic").addEventListener("change", async (event) => {
-    let topic = event.target.value;
-    localStorage.setItem("topic", topic);
-    if (topic === "all") {
-      RenderBooks(booksdata);
-      return;
-    }
-    filteredBooks = booksdata.filter((item) => {
-      return item.bookshelves.join(",").includes(topic);
-    });
+    let title = event.target.value;
+    localStorage.setItem("topic", title);
+    topic = title;
 
-    RenderBooks(filteredBooks);
+    doFilter();
+
+    // RenderBooks(filteredBooks);
   });
 
   loader(document.getElementById("book-list"), true);
@@ -181,23 +187,30 @@ async function homepage() {
   booksdata = result.results;
   filteredBooks = booksdata;
   let hash = window.location.hash;
-  if (hash === "") {
-    let topic = localStorage.getItem("topic");
-    let filter = localStorage.getItem("filter");
 
-    // check if filter an topic exist
-    if (topic && filter) {
+  if (topic) {
+    document.getElementById("topic").value = topic;
+    if (topic === "all" || topic === null) {
+      filteredBooks = booksdata;
+      // RenderBooks(booksdata);
+      // return;
+    } else {
       filteredBooks = booksdata.filter((item) => {
-        return (
-          item.bookshelves.join(",").includes(topic) &&
-          item.title.toLowerCase().includes(filter.toLowerCase())
-        );
+        return item.bookshelves.join(",").includes(topic);
       });
-      RenderBooks(filteredBooks);
     }
-  } else {
-    RenderBooks(result?.results);
   }
+  if (filter) {
+    document.getElementById("filter").value = filter;
+    filteredBooks = booksdata.filter((item) =>
+      item.title.toLowerCase().includes(filter.toLowerCase())
+    );
+    console.log("filtered books", filteredBooks);
+
+    // RenderBooks(filteredBooks);
+  }
+
+  RenderBooks(filteredBooks);
   toggleCount();
 
   RenderPaginate(result);
@@ -207,6 +220,7 @@ async function homepage() {
 async function wishlist() {
   let content = document.getElementById("content");
   content.innerHTML = `<div>
+ 
    <header>
     <nav>
       <a href="#">Home</a>
@@ -226,17 +240,17 @@ async function wishlist() {
   let books = JSON.parse(localStorage.getItem("wishlist"));
 
   if (!books || books.length === 0) {
-    loader(document.getElementById("book-list"), false);
-    location.href = "/";
+    document.getElementById("book-list").innerHTML = `<div>No books in wishlist</div>`;
     return;
   }
-  if (!result) {
-    loader(document.getElementById("book-list"), true);
-    result = await Getdata("https://gutendex.com/books");
-  }
-  toggleCount();
 
+  toggleCount();
+  console.log({ books });
   RenderBooks(books, true);
+  // if (!result) {
+  //   loader(document.getElementById("book-list"), true);
+  //   result = await Getdata("https://gutendex.com/books");
+  // }
 }
 
 function notFound() {
@@ -264,7 +278,7 @@ async function Getdata(url) {
 
   const response = await fetch(url);
   const data = await response.json();
-  isloading = false;
+  // isloading = false;
   // document.querySelector("#next").disabled=false;
   // document.querySelector("#previous").disabled=false;
   return data;
@@ -350,4 +364,40 @@ export function toggleWishlist(book, mydiv) {
   }
 }
 
-/** Events */
+async function doFilter() {
+  try {
+    // console.log("filter called", topic, filter);
+    filter = document.getElementById("filter").value;
+    topic = document.getElementById("topic").value;
+
+    // check by topic
+    let filteredByTopic;
+    if (topic === "all") {
+      filteredBooks = booksdata;
+      filteredByTopic = booksdata;
+    } else {
+      filteredBooks = booksdata.filter((item) => {
+        return item.bookshelves.join(",").includes(topic);
+      });
+      filteredByTopic = filteredBooks;
+      filteredBooks= filteredBooks;
+    }
+    console.log("filtered by topic", filteredByTopic);
+
+    // check by filter
+
+    if (filter == "") {
+      filteredBooks = filteredByTopic;
+    } else {
+      filteredBooks = filteredBooks.filter((item) =>
+        item.title.toLowerCase().includes(filter.toLowerCase())
+      );
+    }
+
+    console.log("filtered books", filteredBooks);
+
+    RenderBooks(filteredBooks);
+  } catch (error) {
+    console.log(error.message);
+  }
+}
