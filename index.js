@@ -83,25 +83,15 @@ async function book(bookId) {
     if (!book) {
       let hash = document.location.hash;
       let first = hash.split("/")[1];
-      // location.href = `/#book/${first}`;
-      // console.log(first)
+
       loader(document.getElementById("content"), true);
       let response = await Getdata(`https://gutendex.com/books/${first}`);
       book = response;
     }
-    // if (!books) {
-    //   location.href = "/";
-    //   return;
-    // }
-    // books = books[0];
-    // console.log({book})
+
   }
-  // console.log({ book });
-  // let loop = [];
-  // books?.forEach((book) => {
-  //   loop.push(BookDesign(book));
-  // });
-  // console.log({ book });
+
+  console.log({ book });
   content.innerHTML = `<div>
   
    <header>
@@ -118,21 +108,34 @@ async function book(bookId) {
     </navbar>
     <div>Book Details</div>
   </header>
-     <div class="book-details-section>
-     
-     </div>
-    <BookDetails>
-    
-    <div>
-      <pre> ${JSON.stringify(book,null,2)} </pre>
-    </div>
-    </BookDetails>
+  <div class="section-book-details">
+      <div class="book-image">
+          <img src="${book.formats["image/jpeg"]}" alt="book cover" />
+      </div>
+        <div class="book-details-area"> 
+            <div class="space-y-16"></div>
+            <div class="book-description">
+                <div class="book-title book-title-font">${book.title}</div>
+                <div class="book-author">By, ${book.authors[0].name}</div>
+                <div class="book-description-text">
+                   <div>Bookshelves</div>
+                   <div>${book.bookshelves.join(", ")}</div>
+                   <div>Languages</div>
+                   <div>${book.languages.join(", ")}</div>
+                   <div>Subjects</div>
+                   <div>${book.subjects.join(", ")}</div>
+                   <div>Copyright</div>
+                   <div>${book.copyright ? "Yes" : "No"}</div>
+                   <div>Media Type</div>
+                   <div>${book.media_type}</div>
+                   <div>Download Count</div>
+                   <div>${book.download_count}</div>
+                </div>
+            </div>
+        </div>
   </div>
-   <style>
-  #wishlist-btn{
-  display: none;
-  }
-  </style>
+
+  </div>
   `;
 
   toggleCount();
@@ -304,13 +307,13 @@ async function Getdata(url) {
     previous.disabled = true;
   }
 
-  // const response = await fetch(url);
-  // const data = await response.json();
+  const response = await fetch(url);
+  const data = await response.json();
   // isloading = false;
   // document.querySelector("#next").disabled=false;
   // document.querySelector("#previous").disabled=false;
-  // return data;
-  return BooksLocal;
+  return data;
+  // return BooksLocal;
 }
 
 function toggleCount() {
