@@ -102,21 +102,31 @@ async function book(bookId) {
   //   loop.push(BookDesign(book));
   // });
   // console.log({ book });
-  content.innerHTML = `<div class="book-details-single">
+  content.innerHTML = `<div>
   
-  <header>
-        <nav>
-          <a href="#">Home</a>
-          <a href="#wishlist">Wishlist</a>
-        </nav>
-        <div class="wishcounter">
-          <span class="mdi--heart"></span>
-          <span class="count">0</span>
-        </div>
-      </header>
-      <div>Welcome to Book Details Page</div>
-    <h1>Book Details</h1>
-    ${book ? BookDesign(book) : ""}
+   <header>
+    <navbar>
+     <nav>
+        <a href="#">Home</a>
+        <a href="#wishlist">Wishlist</a>
+      </nav>
+      <div class="wishcounter">
+        <span class="mdi--heart"></span>
+        <span class="count">0</span>
+      </div>
+      
+    </navbar>
+    <div>Book Details</div>
+  </header>
+     <div class="book-details-section>
+     
+     </div>
+    <BookDetails>
+    
+    <div>
+      <pre> ${JSON.stringify(book,null,2)} </pre>
+    </div>
+    </BookDetails>
   </div>
    <style>
   #wishlist-btn{
@@ -132,6 +142,7 @@ async function homepage() {
   let content = document.getElementById("content");
   let html = `<div>
       <header>
+       <navbar>
         <nav>
           <a href="#">Home</a>
           <a href="#wishlist">Wishlist</a>
@@ -140,22 +151,34 @@ async function homepage() {
           <span class="mdi--heart"></span>
           <span class="count">0</span>
         </div>
+       </navbar>
+        <div>Book List</div>
+
+
       </header>
-      <div>Welcome to Home Page</div>
-      <div>
-        <label for="topic">Filter by topic:</label>
-        <select name="topic" id="topic">
-          <option value="all">All</option>
-          <option value="History">History</option>
-          <option value="Drama">Drama</option>
-          <option value="Culture">Culture</option>
-          <option value="Biographies">Biographies</option>
-          <option value="Literature">Literature</option>
-        </select>
-      </div>
-      <input id="filter" placeholder="Book Title" />
-        <div>Paginate<div>
-        <div id="paginate"></div>
+      
+        
+        <div class="filterArea">
+        <div>
+                <select name="topic" id="topic">
+                    <option value="all">All</option>
+                    <option value="History">History</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Culture">Culture</option>
+                    <option value="Biographies">Biographies</option>
+                    <option value="Literature">Literature</option>
+                  </select>
+                    <input id="filter" placeholder="Book Title" />
+        </div>
+        <div class="paginate-area">
+           
+              <div id="paginate"></div>
+        </div>
+    </div>
+
+    
+      
+    
       <div id="book-list"></div>
   </div>`;
   content.innerHTML = html;
@@ -222,17 +245,20 @@ async function wishlist() {
   content.innerHTML = `<div>
  
    <header>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#wishlist">Wishlist</a>
-
-    </nav>
-    <div class="wishcounter">
-      <span class="mdi--heart"></span>
-      <span class="count">0</span>
-    </div>
+    <navbar>
+     <nav>
+        <a href="#">Home</a>
+        <a href="#wishlist">Wishlist</a>
+      </nav>
+      <div class="wishcounter">
+        <span class="mdi--heart"></span>
+        <span class="count">0</span>
+      </div>
+      
+    </navbar>
+    <div>Wish List</div>
   </header>
-  <div>Welcome to Wishlist Page</div>
+  
 
   <div id="book-list"></div>
   </div>`;
@@ -240,7 +266,9 @@ async function wishlist() {
   let books = JSON.parse(localStorage.getItem("wishlist"));
 
   if (!books || books.length === 0) {
-    document.getElementById("book-list").innerHTML = `<div>No books in wishlist</div>`;
+    document.getElementById(
+      "book-list"
+    ).innerHTML = `<div>No books in wishlist</div>`;
     return;
   }
 
@@ -276,13 +304,13 @@ async function Getdata(url) {
     previous.disabled = true;
   }
 
-  const response = await fetch(url);
-  const data = await response.json();
+  // const response = await fetch(url);
+  // const data = await response.json();
   // isloading = false;
   // document.querySelector("#next").disabled=false;
   // document.querySelector("#previous").disabled=false;
-  return data;
-  // return BooksLocal;
+  // return data;
+  return BooksLocal;
 }
 
 function toggleCount() {
@@ -380,7 +408,7 @@ async function doFilter() {
         return item.bookshelves.join(",").includes(topic);
       });
       filteredByTopic = filteredBooks;
-      filteredBooks= filteredBooks;
+      filteredBooks = filteredBooks;
     }
     console.log("filtered by topic", filteredByTopic);
 
